@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Kirito Tools
 // @namespace    -
-// @version      0.3.3
+// @version      0.3.4
 // @description  mykirito.com 的界面調整，不包含任何自動操作。
 // @author       LianSheng
 // @include      https://mykirito.com/*
@@ -139,7 +139,7 @@ function addPointsToCompare(tableRows, playerData) {
                             let start = Date.now();
 
                             // TODO: make a cors service by GAS.
-                            let color = await fetch("https://cors-anywhere.herokuapp.com/https://us-central1-kirito-1585904519813.cloudfunctions.net/getMyKiritoFn", {
+                            let color = await fetch("https://mykirito.com/api/my-kirito", {
                                 "headers": {
                                     "accept": "application/json, text/plain, */*",
                                     "token": token
