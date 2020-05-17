@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Kirito Tools
 // @namespace    -
-// @version      0.3.4
+// @version      0.3.5
 // @description  mykirito.com 的界面調整，不包含任何自動操作。
 // @author       LianSheng
 // @include      https://mykirito.com/*
@@ -45,10 +45,26 @@ function addPointsToCompare(tableRows, playerData) {
     let cds = await fetch(`https://mykirito.com/${frontend}`).then(r => r.text()).then(t => {
         return t.match(/;var\ .+?(\d\+?e\d);var\ .+?(\d+?e\d);var\ .+?(\d+?e\d);var\ .+?(\d+?e\d)/);
     });
+    let token = localStorage.getItem("token");
+    let mydata = await fetch("https://mykirito.com/api/my-kirito", {
+        "headers": {
+            "accept": "application/json, text/plain, */*",
+            "token": token
+        },
+        "referrer": "https://mykirito.com/",
+        "referrerPolicy": "no-referrer-when-downgrade",
+        "body": null,
+        "method": "GET",
+        "mode": "cors",
+        "credentials": "omit"
+    }).then(r =>
+        r.json()
+    );
 
     let cdChallenge = cds[1] - 0;
     let cdChallengeRed = cds[2] - 0;
     let notificationSeconds = 20;
+    let levelExp = [0, 30, 60, 100, 150, 200, 250, 300, 370, 450, 500, 650, 800, 950, 1200, 1450, 1700, 1950, 2200, 2500, 2800, 3100, 3400, 3700, 4000, 4400, 4800, 5200, 5600, 6000, 6500, 7000, 7500, 8000, 8500, 9100, 9700, 10300, 11000, 11800, 12600, 13500, 14400, 15300, 16200, 17100, 18000, 19000, 20000, 21000, 23000, 25000, 27000, 29000, 31000, 33000, 35000, 37000, 39000, 41000, 44000, 47000, 53000];
 
     document.querySelector("div#root").insertAdjacentHTML("afterend", `<div id="us_customSpace"></div>`);
 
@@ -75,13 +91,11 @@ function addPointsToCompare(tableRows, playerData) {
             GM_setValue("NotifiTime", "-1");
         }
 
-        // 在玩家頁面
         if (url.includes("profile")) {
-            // 確保只執行一次
+            // 在其他玩家頁面
             if (url != lastUrl) {
                 lastUrl = url;
 
-                let token = localStorage.getItem("token");
                 let playerId = url.match(/\/([0-9a-zA-Z]+?)$/)[1];
                 let buttonTypes = document.querySelectorAll("div#root > div > div > div:nth-child(1) > button");
 
@@ -170,6 +184,33 @@ function addPointsToCompare(tableRows, playerData) {
                     });
                 });
             }
+        } else if (url.match("https://mykirito.com/")) {
+            // 在首頁
+            if (url != lastUrl) {
+                lastUrl = url;
+
+                mydata = await fetch("https://mykirito.com/api/my-kirito", {
+                    "headers": {
+                        "accept": "application/json, text/plain, */*",
+                        "token": token
+                    },
+                    "referrer": "https://mykirito.com/",
+                    "referrerPolicy": "no-referrer-when-downgrade",
+                    "body": null,
+                    "method": "GET",
+                    "mode": "cors",
+                    "credentials": "omit"
+                }).then(r =>
+                    r.json()
+                );
+
+                let nowExp = mydata.exp;
+                let nextLevelReq = levelExp[mydata.lv];
+                let expTd = document.querySelector("div#root > div > div:nth-child(1) > div:nth-child(1) > table tr:nth-child(4) > td:nth-child(4)");
+
+                expTd.innerText = `${nowExp} / ${nextLevelReq}`;
+            }
+
         } else {
             lastUrl = "";
         }
