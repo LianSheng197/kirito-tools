@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Kirito Tools
 // @namespace    -
-// @version      0.3.5
+// @version      0.3.6
 // @description  mykirito.com 的界面調整，不包含任何自動操作。
 // @author       LianSheng
 // @include      https://mykirito.com/*
@@ -184,7 +184,7 @@ function addPointsToCompare(tableRows, playerData) {
                     });
                 });
             }
-        } else if (url.match("https://mykirito.com/")) {
+        } else if (url.match(/https:\/\/mykirito\.com\/?$/)) {
             // 在首頁
             if (url != lastUrl) {
                 lastUrl = url;
