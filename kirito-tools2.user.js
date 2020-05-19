@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Kirito Tools
 // @namespace    -
-// @version      0.3.7
+// @version      0.3.8
 // @description  mykirito.com 的界面調整，不包含任何自動操作。
 // @author       LianSheng
 // @include      https://mykirito.com/*
@@ -207,28 +207,31 @@ function mobileCheck() {
                 if (url != lastUrl) {
                     lastUrl = url;
 
-                    mydata = await fetch("https://mykirito.com/api/my-kirito", {
-                        "headers": {
-                            "accept": "application/json, text/plain, */*",
-                            "token": token
-                        },
-                        "referrer": "https://mykirito.com/",
-                        "referrerPolicy": "no-referrer-when-downgrade",
-                        "body": null,
-                        "method": "GET",
-                        "mode": "cors",
-                        "credentials": "omit"
-                    }).then(r =>
-                        r.json()
-                    );
-
-                    let nowExp = mydata.exp;
-                    let nextLevelReq = levelExp[mydata.lv];
                     let expTd = document.querySelector("div#root > div > div:nth-child(1) > div:nth-child(1) > table tr:nth-child(4) > td:nth-child(4)");
+                    let nextLevelReq = levelExp[mydata.lv];
 
-                    expTd.innerText = `${nowExp} / ${nextLevelReq}`;
+                    // 僅在等級變更時才需要更新資料（這裡靠原經驗值判斷）
+                    if (expTd.innerText >= nextLevelReq) {
+                        mydata = await fetch("https://mykirito.com/api/my-kirito", {
+                            "headers": {
+                                "accept": "application/json, text/plain, */*",
+                                "token": token
+                            },
+                            "referrer": "https://mykirito.com/",
+                            "referrerPolicy": "no-referrer-when-downgrade",
+                            "body": null,
+                            "method": "GET",
+                            "mode": "cors",
+                            "credentials": "omit"
+                        }).then(r =>
+                            r.json()
+                        );
+
+                        nextLevelReq = levelExp[mydata.lv];
+                    }
+
+                    expTd.innerText += ` / ${nextLevelReq}`;
                 }
-
             } else {
                 lastUrl = "";
             }
