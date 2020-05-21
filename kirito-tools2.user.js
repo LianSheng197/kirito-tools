@@ -1,10 +1,11 @@
 // ==UserScript==
 // @name         Kirito Tools
 // @namespace    -
-// @version      0.3.10
+// @version      0.3.11
 // @description  mykirito.com 的界面調整，不包含任何自動操作。
 // @author       LianSheng
 // @include      https://mykirito.com/*
+// @include      https://kirito-1585904519813.appspot.com/*
 // @grant        GM_setValue
 // @grant        GM_getValue
 // @license      MIT
