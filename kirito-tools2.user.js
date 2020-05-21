@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Kirito Tools
 // @namespace    -
-// @version      0.3.9
+// @version      0.3.10
 // @description  mykirito.com 的界面調整，不包含任何自動操作。
 // @author       LianSheng
 // @include      https://mykirito.com/*
@@ -280,7 +280,7 @@ function mobileCheck() {
                                 "token": token
                             }
                         }).then(r => r.json()).then(j => j.profile);
-                    } else {
+                    } else if(mydata._id == reportJson.b.uid) {
                         // 當自己為防禦方時
                         let playerId = reportJson.a.uid;
                         attackerData = await fetch(`https://mykirito.com/api/profile/${playerId}`, {
@@ -289,6 +289,21 @@ function mobileCheck() {
                             }
                         }).then(r => r.json()).then(j => j.profile);
                         defenderData = mydata;
+                    } else {
+                        // 檢視別人的戰報
+                        let atkId = reportJson.a.uid;
+                        let defId = reportJson.b.uid;
+
+                        attackerData = await fetch(`https://mykirito.com/api/profile/${atkId}`, {
+                            "headers": {
+                                "token": token
+                            }
+                        }).then(r => r.json()).then(j => j.profile);
+                        defenderData = await fetch(`https://mykirito.com/api/profile/${defId}`, {
+                            "headers": {
+                                "token": token
+                            }
+                        }).then(r => r.json()).then(j => j.profile);
                     }
 
                     addPointsAndLinkToReport(attackerTableRows, attackerData, defenderTableRows, defenderData);
