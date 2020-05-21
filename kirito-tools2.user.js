@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Kirito Tools
 // @namespace    -
-// @version      0.3.11
+// @version      0.3.12
 // @description  mykirito.com 的界面調整，不包含任何自動操作。
 // @author       LianSheng
 // @include      https://mykirito.com/*
@@ -25,16 +25,26 @@ function addPointsToDetail(tableRows, playerData) {
 }
 
 // （能力比對）顯示其他玩家的轉生點加成
-function addPointsToCompare(tableRows, playerData) {
-    tableRows[6].querySelector("td").innerHTML += `<span style="color: rgb(0, 181, 181);"> ${playerData.rattrs.hp > 0? "(+"+playerData.rattrs.hp*10+")" : ""}</span>`;
-    tableRows[7].querySelector("td").innerHTML += `<span style="color: rgb(0, 181, 181);"> ${playerData.rattrs.atk > 0? "(+"+playerData.rattrs.atk+")" : ""}</span>`;
-    tableRows[8].querySelector("td").innerHTML += `<span style="color: rgb(0, 181, 181);"> ${playerData.rattrs.def > 0? "(+"+playerData.rattrs.def+")" : ""}</span>`;
-    tableRows[9].querySelector("td").innerHTML += `<span style="color: rgb(0, 181, 181);"> ${playerData.rattrs.stm > 0? "(+"+playerData.rattrs.stm+")" : ""}</span>`;
-    tableRows[10].querySelector("td").innerHTML += `<span style="color: rgb(0, 181, 181);"> ${playerData.rattrs.agi > 0? "(+"+playerData.rattrs.agi+")" : ""}</span>`;
-    tableRows[11].querySelector("td").innerHTML += `<span style="color: rgb(0, 181, 181);"> ${playerData.rattrs.spd > 0? "(+"+playerData.rattrs.spd+")" : ""}</span>`;
-    tableRows[12].querySelector("td").innerHTML += `<span style="color: rgb(0, 181, 181);"> ${playerData.rattrs.tec > 0? "(+"+playerData.rattrs.tec+")" : ""}</span>`;
-    tableRows[13].querySelector("td").innerHTML += `<span style="color: rgb(0, 181, 181);"> ${playerData.rattrs.int > 0? "(+"+playerData.rattrs.int+")" : ""}</span>`;
-    tableRows[14].querySelector("td").innerHTML += `<span style="color: rgb(0, 181, 181);"> ${playerData.rattrs.lck > 0? "(+"+playerData.rattrs.lck+")" : ""}</span>`;
+function addPointsToCompare(myTr, myData, playerTr, playerData) {
+    myTr[6].querySelector("td").innerHTML += `<span style="color: rgb(0, 181, 181);"> ${myData.rattrs.hp > 0? "(+"+myData.rattrs.hp*10+")" : ""}</span>`;
+    myTr[7].querySelector("td").innerHTML += `<span style="color: rgb(0, 181, 181);"> ${myData.rattrs.atk > 0? "(+"+myData.rattrs.atk+")" : ""}</span>`;
+    myTr[8].querySelector("td").innerHTML += `<span style="color: rgb(0, 181, 181);"> ${myData.rattrs.def > 0? "(+"+myData.rattrs.def+")" : ""}</span>`;
+    myTr[9].querySelector("td").innerHTML += `<span style="color: rgb(0, 181, 181);"> ${myData.rattrs.stm > 0? "(+"+myData.rattrs.stm+")" : ""}</span>`;
+    myTr[10].querySelector("td").innerHTML += `<span style="color: rgb(0, 181, 181);"> ${myData.rattrs.agi > 0? "(+"+myData.rattrs.agi+")" : ""}</span>`;
+    myTr[11].querySelector("td").innerHTML += `<span style="color: rgb(0, 181, 181);"> ${myData.rattrs.spd > 0? "(+"+myData.rattrs.spd+")" : ""}</span>`;
+    myTr[12].querySelector("td").innerHTML += `<span style="color: rgb(0, 181, 181);"> ${myData.rattrs.tec > 0? "(+"+myData.rattrs.tec+")" : ""}</span>`;
+    myTr[13].querySelector("td").innerHTML += `<span style="color: rgb(0, 181, 181);"> ${myData.rattrs.int > 0? "(+"+myData.rattrs.int+")" : ""}</span>`;
+    myTr[14].querySelector("td").innerHTML += `<span style="color: rgb(0, 181, 181);"> ${myData.rattrs.lck > 0? "(+"+myData.rattrs.lck+")" : ""}</span>`;
+
+    playerTr[6].querySelector("td").innerHTML += `<span style="color: rgb(0, 181, 181);"> ${playerData.rattrs.hp > 0? "(+"+playerData.rattrs.hp*10+")" : ""}</span>`;
+    playerTr[7].querySelector("td").innerHTML += `<span style="color: rgb(0, 181, 181);"> ${playerData.rattrs.atk > 0? "(+"+playerData.rattrs.atk+")" : ""}</span>`;
+    playerTr[8].querySelector("td").innerHTML += `<span style="color: rgb(0, 181, 181);"> ${playerData.rattrs.def > 0? "(+"+playerData.rattrs.def+")" : ""}</span>`;
+    playerTr[9].querySelector("td").innerHTML += `<span style="color: rgb(0, 181, 181);"> ${playerData.rattrs.stm > 0? "(+"+playerData.rattrs.stm+")" : ""}</span>`;
+    playerTr[10].querySelector("td").innerHTML += `<span style="color: rgb(0, 181, 181);"> ${playerData.rattrs.agi > 0? "(+"+playerData.rattrs.agi+")" : ""}</span>`;
+    playerTr[11].querySelector("td").innerHTML += `<span style="color: rgb(0, 181, 181);"> ${playerData.rattrs.spd > 0? "(+"+playerData.rattrs.spd+")" : ""}</span>`;
+    playerTr[12].querySelector("td").innerHTML += `<span style="color: rgb(0, 181, 181);"> ${playerData.rattrs.tec > 0? "(+"+playerData.rattrs.tec+")" : ""}</span>`;
+    playerTr[13].querySelector("td").innerHTML += `<span style="color: rgb(0, 181, 181);"> ${playerData.rattrs.int > 0? "(+"+playerData.rattrs.int+")" : ""}</span>`;
+    playerTr[14].querySelector("td").innerHTML += `<span style="color: rgb(0, 181, 181);"> ${playerData.rattrs.lck > 0? "(+"+playerData.rattrs.lck+")" : ""}</span>`;
 }
 
 // （戰報）顯示雙方的轉生點加成
@@ -94,7 +104,7 @@ function mobileCheck() {
             return t.match(/;var\ .+?(\d\+?e\d);var\ .+?(\d+?e\d);var\ .+?(\d+?e\d);var\ .+?(\d+?e\d)/);
         });
         let token = localStorage.getItem("token");
-        let mydata = await fetch("https://mykirito.com/api/my-kirito", {
+        let myData = await fetch("https://mykirito.com/api/my-kirito", {
             "headers": {
                 "accept": "application/json, text/plain, */*",
                 "token": token
@@ -141,7 +151,6 @@ function mobileCheck() {
                     let playerId = url.match(/\/([0-9a-zA-Z]+?)$/)[1];
                     let buttonTypes = document.querySelectorAll("div#root > div > div > div:nth-child(1) > button");
 
-
                     let playerData = await fetch(`https://mykirito.com/api/profile/${playerId}`, {
                         "headers": {
                             "token": token
@@ -149,15 +158,16 @@ function mobileCheck() {
                     }).then(r => r.json()).then(t => t.profile);
 
                     // 哪個按鈕禁止點擊就表示在哪個查看類型
-                    let tableRows;
+                    let myTr, playerTr;
                     if (buttonTypes[0].disabled) {
                         // （初始化、詳細資料）顯示其他玩家的轉生點加成
-                        tableRows = document.querySelectorAll("div#root > div > div > div:nth-child(1) > table tr");
-                        addPointsToDetail(tableRows, playerData);
+                        playerTr = document.querySelectorAll("div#root > div > div > div:nth-child(1) > table tr");
+                        addPointsToDetail(playerTr, playerData);
                     } else {
                         // （初始化、能力比對）顯示其他玩家的轉生點加成
-                        tableRows = document.querySelectorAll("div#root > div > div > div:nth-child(1) > div > table:nth-child(2) tr");
-                        addPointsToCompare(tableRows, playerData);
+                        myTr = document.querySelectorAll("div#root > div > div > div:nth-child(1) > div > table:nth-child(1) tr");
+                        playerTr = document.querySelectorAll("div#root > div > div > div:nth-child(1) > div > table:nth-child(2) tr");
+                        addPointsToCompare(myTr, myData, playerTr, playerData);
                     }
 
                     // 事件監聽：切換查看類型的兩個按鈕
@@ -232,11 +242,11 @@ function mobileCheck() {
                     lastUrl = url;
 
                     let expTd = document.querySelector("div#root > div > div:nth-child(1) > div:nth-child(1) > table tr:nth-child(4) > td:nth-child(4)");
-                    let nextLevelReq = levelExp[mydata.lv];
+                    let nextLevelReq = levelExp[myData.lv];
 
                     // 僅在等級變更時才需要更新資料（這裡靠原經驗值判斷）
                     if (expTd.innerText >= nextLevelReq) {
-                        mydata = await fetch("https://mykirito.com/api/my-kirito", {
+                        myData = await fetch("https://mykirito.com/api/my-kirito", {
                             "headers": {
                                 "accept": "application/json, text/plain, */*",
                                 "token": token
@@ -251,7 +261,7 @@ function mobileCheck() {
                             r.json()
                         );
 
-                        nextLevelReq = levelExp[mydata.lv];
+                        nextLevelReq = levelExp[myData.lv];
                     }
 
                     expTd.innerText += ` / ${nextLevelReq}`;
@@ -272,16 +282,16 @@ function mobileCheck() {
                     defenderTableRows[3].querySelector("td").innerHTML = `<a href="https://mykirito.com/profile/${reportJson.b.uid}">${reportJson.b.nickname}</a>`;
 
                     let attackerData, defenderData;
-                    if (mydata._id == reportJson.a.uid) {
+                    if (myData._id == reportJson.a.uid) {
                         // 當自己為攻擊方時
                         let playerId = reportJson.b.uid;
-                        attackerData = mydata;
+                        attackerData = myData;
                         defenderData = await fetch(`https://mykirito.com/api/profile/${playerId}`, {
                             "headers": {
                                 "token": token
                             }
                         }).then(r => r.json()).then(j => j.profile);
-                    } else if(mydata._id == reportJson.b.uid) {
+                    } else if(myData._id == reportJson.b.uid) {
                         // 當自己為防禦方時
                         let playerId = reportJson.a.uid;
                         attackerData = await fetch(`https://mykirito.com/api/profile/${playerId}`, {
@@ -289,7 +299,7 @@ function mobileCheck() {
                                 "token": token
                             }
                         }).then(r => r.json()).then(j => j.profile);
-                        defenderData = mydata;
+                        defenderData = myData;
                     } else {
                         // 檢視別人的戰報
                         let atkId = reportJson.a.uid;
