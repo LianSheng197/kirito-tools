@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Kirito Tools
 // @namespace    -
-// @version      0.3.12
+// @version      0.3.13
 // @description  mykirito.com 的界面調整，不包含任何自動操作。
 // @author       LianSheng
 // @include      https://mykirito.com/*
@@ -84,6 +84,36 @@ function mobileCheck() {
     return check;
 };
 
+// 表格底部訊息
+// type: (0 正常, 1 錯誤)
+function msg(str, type) {
+    // 在表格底部添加訊息位
+    if (document.querySelectorAll("div#root > div > div > div").length != 0 && document.querySelectorAll("div#us_msgArea").length == 0) {
+        let html = `
+            <div id="us_msgArea"></div>
+        `;
+        document.querySelector("div#root > div > div > div").insertAdjacentHTML("beforeend", html);
+    }
+
+    let msgArea = document.querySelector("div#us_msgArea");
+    msgArea.style.color = (type == 0) ? "green" : "red";
+    msgArea.style.textAlign = "right";
+    msgArea.innerHTML = `<b>${str}</b>`;
+
+    // 強制讓訊息置於表格底下（不然切換查看模式時會跳到表格上方）
+    document.querySelector("div#root > div > div > div").insertAdjacentElement("beforeend", msgArea);
+}
+
+// 計算總轉生點數
+function calcTotalPoints(rattrs) {
+    let total = 0;
+    for (let key in rattrs) {
+        total += rattrs[key];
+    }
+
+    return total;
+}
+
 (async function() {
     'use strict';
 
@@ -155,7 +185,14 @@ function mobileCheck() {
                         "headers": {
                             "token": token
                         }
-                    }).then(r => r.json()).then(t => t.profile);
+                    }).then(
+                        r => r.json()
+                    ).then(
+                        t => t.profile
+                    ).catch(error => {
+                        msg("錯誤：請求玩家資料失敗", 1);
+                        return;
+                    });
 
                     // 哪個按鈕禁止點擊就表示在哪個查看類型
                     let myTr, playerTr;
@@ -163,11 +200,18 @@ function mobileCheck() {
                         // （初始化、詳細資料）顯示其他玩家的轉生點加成
                         playerTr = document.querySelectorAll("div#root > div > div > div:nth-child(1) > table tr");
                         addPointsToDetail(playerTr, playerData);
+
+                        let defPts = calcTotalPoints(playerData.rattrs);
+                        msg(`轉生點資料解析完成，玩家總點數為（${defPts}）`, 0);
                     } else {
                         // （初始化、能力比對）顯示其他玩家的轉生點加成
                         myTr = document.querySelectorAll("div#root > div > div > div:nth-child(1) > div > table:nth-child(1) tr");
                         playerTr = document.querySelectorAll("div#root > div > div > div:nth-child(1) > div > table:nth-child(2) tr");
                         addPointsToCompare(myTr, myData, playerTr, playerData);
+
+                        let atkPts = calcTotalPoints(myData.rattrs);
+                        let defPts = calcTotalPoints(playerData.rattrs);
+                        msg(`轉生點資料解析完成，雙方總點數為（${atkPts}, ${defPts}）`, 0);
                     }
 
                     // 事件監聽：切換查看類型的兩個按鈕
@@ -176,6 +220,9 @@ function mobileCheck() {
                             try {
                                 let tableRows = document.querySelectorAll("div#root > div > div > div:nth-child(1) > table tr");
                                 addPointsToDetail(tableRows, playerData);
+
+                                let defPts = calcTotalPoints(playerData.rattrs);
+                                msg(`轉生點資料解析完成，玩家總點數為（${defPts}）`, 0);
 
                                 if (document.querySelectorAll("div#root > div > div > div:nth-child(1) > table tr span").length > 0) {
                                     clearInterval(id);
@@ -186,8 +233,12 @@ function mobileCheck() {
                     buttonTypes[1].addEventListener("click", function() {
                         let id = setInterval(() => {
                             try {
-                                let tableRows = document.querySelectorAll("div#root > div > div > div:nth-child(1) > div > table:nth-child(2) tr");
-                                addPointsToCompare(tableRows, playerData);
+                                playerTr = document.querySelectorAll("div#root > div > div > div:nth-child(1) > div > table:nth-child(2) tr");
+                                addPointsToCompare(myTr, myData, playerTr, playerData);
+
+                                let atkPts = calcTotalPoints(myData.rattrs);
+                                let defPts = calcTotalPoints(playerData.rattrs);
+                                msg(`轉生點資料解析完成，雙方總點數為（${atkPts}, ${defPts}）`, 0);
 
                                 if (document.querySelectorAll("div#root > div > div > div:nth-child(1) > div > table:nth-child(2) tr span").length > 0) {
                                     clearInterval(id);
@@ -204,7 +255,6 @@ function mobileCheck() {
                             if (!button.disabled) {
                                 let start = Date.now();
 
-                                // TODO: make a cors service by GAS.
                                 let color = await fetch("https://mykirito.com/api/my-kirito", {
                                     "headers": {
                                         "accept": "application/json, text/plain, */*",
@@ -290,34 +340,66 @@ function mobileCheck() {
                             "headers": {
                                 "token": token
                             }
-                        }).then(r => r.json()).then(j => j.profile);
-                    } else if(myData._id == reportJson.b.uid) {
+                        }).then(
+                            r => r.json()
+                        ).then(
+                            j => j.profile
+                        ).catch(error => {
+                            msg("錯誤：請求玩家資料失敗", 1);
+                            return;
+                        });
+                    } else if (myData._id == reportJson.b.uid) {
                         // 當自己為防禦方時
                         let playerId = reportJson.a.uid;
                         attackerData = await fetch(`https://mykirito.com/api/profile/${playerId}`, {
                             "headers": {
                                 "token": token
                             }
-                        }).then(r => r.json()).then(j => j.profile);
+                        }).then(
+                            r => r.json()
+                        ).then(
+                            j => j.profile
+                        ).catch(error => {
+                            msg("錯誤：請求玩家資料失敗", 1);
+                            return;
+                        });
                         defenderData = myData;
                     } else {
                         // 檢視別人的戰報
                         let atkId = reportJson.a.uid;
                         let defId = reportJson.b.uid;
 
-                        attackerData = await fetch(`https://mykirito.com/api/profile/${atkId}`, {
+                        attackerData = await await fetch(`https://mykirito.com/api/profile/${playerId}`, {
                             "headers": {
                                 "token": token
                             }
-                        }).then(r => r.json()).then(j => j.profile);
-                        defenderData = await fetch(`https://mykirito.com/api/profile/${defId}`, {
+                        }).then(
+                            r => r.json()
+                        ).then(
+                            j => j.profile
+                        ).catch(error => {
+                            msg("錯誤：請求攻擊方玩家資料失敗", 1);
+                            return;
+                        });
+                        defenderData = await fetch(`https://mykirito.com/api/profile/${playerId}`, {
                             "headers": {
                                 "token": token
                             }
-                        }).then(r => r.json()).then(j => j.profile);
+                        }).then(
+                            r => r.json()
+                        ).then(
+                            j => j.profile
+                        ).catch(error => {
+                            msg("錯誤：請求防禦方玩家資料失敗", 1);
+                            return;
+                        });
                     }
 
                     addPointsAndLinkToReport(attackerTableRows, attackerData, defenderTableRows, defenderData);
+
+                    let atkPts = calcTotalPoints(attackerData.rattrs);
+                    let defPts = calcTotalPoints(defenderData.rattrs);
+                    msg(`轉生點資料解析完成，雙方總點數為（${atkPts}, ${defPts}）`, 0);
                 }
             } else {
                 lastUrl = "";
